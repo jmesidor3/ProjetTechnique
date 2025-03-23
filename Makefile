@@ -14,7 +14,7 @@ help:
 	@echo "To test the project type make test"
 	@echo "To run the project type make run"
 	@echo "------------------------------------"
-clean: clean-build clean-pyc destroy
+clean: clean-build clean-pyc
 	
 
 flake8: 
@@ -34,20 +34,20 @@ test-coverage: ## Cleanup and deactivate venv
 	cd wsgi && $(MAKE) test
 
 test: ## Run pytest
-	@docker exec wsgi1 pytest . --junitxml=/app/pytest.xml
-	@docker cp wsgi1:/app/pytest.xml ./pytest.xml
+	@docker exec biblio_app pytest . --junitxml=/app/pytest.xml
+	@docker cp biblio_app:/app/pytest.xml ./pytest.xml
 
 docs:  
 	cd wsgi && $(PYTHON) -m pdoc --force --output-dir docs biblio/templates 
-	@docker cp wsgi1:$(DOCS_DIR) ./docs
+	@docker cp biblio_app:$(DOCS_DIR) ./docs
 
 setup: destroy ## sets up environment and installs requirements
 	@docker compose up -d
 
 coverage-check: ## Create docker image
-	@docker exec wsgi1 coverage run -m pytest .
-	@docker exec wsgi1 coverage xml -o /app/coverage.xml
-	@docker cp wsgi1:/app/coverage.xml ./coverage.xml
+	@docker exec biblio_app coverage run -m pytest .
+	@docker exec biblio_app coverage xml -o /app/coverage.xml
+	@docker cp biblio_app:/app/coverage.xml ./coverage.xml
 clean-build:
 	rm -fr build/
 	rm -fr dist/
@@ -63,7 +63,7 @@ destroy: ## build, start and run docker image
 	#@docker stop $(docker ps -q)
 	#@docker network rm -f front_network back_network
 	# docker rmi -f nginx:1.25.3
-	# docker rmi -f wsgi0:1.0  wsgi1:1.0 wsgi2:1.0
+	# docker rmi -f biblio_app:1.0 
 	# docker rmi -f redis:7.2.4
 	# docker rmi -f mysql:8.0.22
 	@docker volume rm -f mysql_volume

@@ -46,16 +46,11 @@ pipeline {
                 }
             }
         }
-        stage('Clone repository') {
-            steps {
-                // Checkout du code depuis le référentiel Git
-                git 'https://github.com/josephpierres/MGL7760-H2024-Projet1-Groupe-1.git'
-            }
-        }
+       
         
         stage('Deploy with Helmfile') {
             steps {
-                sh 'kubectl apply -f yamls/'
+                echo 'deploy app'
             }
         }
     }

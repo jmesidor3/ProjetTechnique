@@ -5,7 +5,6 @@ global:
     monitor: 'biblio-monitor' # Étiquette utilisée pour identifier la source des métriques
 
 rule_files:
-# - /etc/prometheus/alert.yml # Fichier des règles d'alertes
 - /etc/prometheus/alert.yml # Fichier des règles d'alertes
 
 alerting:
@@ -15,11 +14,32 @@ alerting:
       - alertmanager:9093 # URL du service Alertmanager
 
 scrape_configs:
-- job_name: 'mysql'
+- job_name: 'prometheus'
+  static_configs:
+  - targets: [ 'prometheus:9090' ]
+  
+- job_name: 'mysql-exporter'
   static_configs:
   - targets: [ 'mysql-exporter:9104' ]
-  # Scrape config pour l'application Flask exposant Prometheus
-- job_name: 'biblio-nginx'
+ 
+
+- job_name: 'biblio-api'
   static_configs:
-  - targets: [ 'localhost:8000' ]
+  - targets: [ 'biblio_api:8082' ]
   metrics_path: /metrics
+
+- job_name: 'biblio-app'
+  static_configs:
+  - targets: [ 'biblio_app:8083' ]
+  metrics_path: /metrics
+
+- job_name: 'mysql'
+  static_configs:
+  - targets: [ 'mysql:3306' ]
+
+- job_name: 'elasticsearch'
+  metrics_path: /_prometheus/metrics
+  static_configs:
+  - targets: [ 'elasticsearch:14269' ]
+  
+  
