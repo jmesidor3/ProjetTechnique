@@ -1,0 +1,94 @@
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+processors:
+# - add_cloud_metadata: ~
+- add_docker_metadata: ~
+
+output.elasticsearch:
+  hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'
+  # username: '${ELASTICSEARCH_USERNAME:}'
+  # password: '${ELASTICSEARCH_PASSWORD:}'
+
+# enabled modules for monitoring (e.g. elasticsearch-xpack)
+metricbeat.modules:
+
+# Metrics collected from a Prometheus endpoint
+- module: prometheus
+  period: 10s
+  metricsets: ["collector"]
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+
+
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metricsets: ["query"]
+  queries:
+  - name: "rate_http_requests_total"
+    path: "/api/v1/query"
+    params:
+      query: "rate(prometheus_http_requests_total[5m])"
+
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metricsets: ["query"]
+  queries:
+  - name: 'up'
+    path: '/api/v1/query'
+    params:
+      query: "up"
+
+
+#---------------------------- Nginx Status Module ---------------------------
+# error: https://discuss.elastic.co/t/metricbeat-cant-collect-nginx-metrics/76911/6
+- module: nginx
+  metricsets: ["stubstatus"]
+  enabled: true
+  period: 10s
+  # Nginx hosts
+  hosts: ["http://nginx:8000/server_status"]
+  # Path to server status. Default nginx_status
+  # server_status_path: "nginx_status"
+
+#---------------------------- MySQL Status Module ----------------------------
+- module: mysql
+  metricsets:
+  - status
+  #  - galera_status
+  - performance
+  # - query
+  period: 10s # pour les mesures critiques
+  hosts: ["root:password@tcp(mysql:3306)/"]
+  # username: root
+  # password: password
+
+#---------------------------- Redis Status Module ----------------------------
+- module: redis
+  metricsets: ["info", "keyspace"]
+  enabled: true
+  period: 10s
+  # Redis hosts
+  hosts: ["redis:6379/0"]
+
+
+- module: uwsgi
+  metricsets: ["status"]
+  enable: true
+  period: 10s
+  hosts: ["http://localhost:8083/metrics"]
+
+- module: uwsgi
+  metricsets: ["status"]
+  enable: true
+  period: 10s
+  hosts: ["http://localhost:8082/metrics"]
+
+
+- module: elasticsearch
+  xpack.enabled: true
+  period: 10s
+  hosts: ["http://elasticsearch:9200"]

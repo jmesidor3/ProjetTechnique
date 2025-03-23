@@ -1,0 +1,42 @@
+server:
+  http_listen_port: 3200 # Port d'écoute pour le service HTTP
+  log_level: info # Niveau de logs
+
+distributor:
+  receivers:
+    otlp: # Protocole de réception OTLP
+      protocols:
+        grpc:
+        http:
+
+ingester:
+  max_block_duration: 10m # Durée maximale des blocs
+
+compactor:
+  compaction:
+    block_retention: 24h # Durée de rétention des blocs
+
+storage:
+  trace:
+    backend: local # Backend de stockage local
+    wal:
+      path: /var/tempo/wal # Chemin pour le Write-Ahead Log
+    local:
+      path: /var/tempo/blocks # Chemin de stockage des blocs
+
+metrics_generator:
+  registry:
+    external_labels:
+      source: tempo # Label pour les métriques générées
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+    - url: http://prometheus:9090/api/v1/write
+      send_exemplars: true
+  traces_storage:
+    path: /var/tempo/generator/traces
+
+overrides:
+  defaults:
+    metrics_generator:
+      processors: [service-graphs, span-metrics, local-blocks]

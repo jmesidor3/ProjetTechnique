@@ -1,0 +1,15 @@
+# httpx==0.27.0
+prometheus_fastapi_instrumentator
+opentelemetry-instrumentation-sqlalchemy
+pymysql
+fastapi
+uvicorn
+prometheus-client
+opentelemetry-distro
+opentelemetry-instrumentation-fastapi
+opentelemetry-instrumentation-starlette
+opentelemetry-instrumentation-logging
+opentelemetry-exporter-otlp
+sqlalchemy
+fluent-logger
+

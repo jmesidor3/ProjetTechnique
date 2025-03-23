@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de la biliotheque</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+    <h1>{{ date_du_jour }} Biblio</h1>
+    <h3>L'heure actuelle est : <span id="heureId"></span></h3>
+    <hr />
+    <br />
+    <div class="container">
+        <h1>Menu Utilisateur</h1>
+        <ul class="list-group">
+            <li class="list-group-item"><a href="{{ url_for('get_all_books') }}">Voir la liste des livres disponibles</a></li>
+            <li class="list-group-item"><a href="{{ url_for('get_books_by_category') }}">Filtrer la liste des livres par catégorie</a></li>
+            <li class="list-group-item"><a href="{{ url_for('get_books_by_title') }}">Rechercher des livres par titre</a></li>
+            <li class="list-group-item"><a href="{{ url_for('get_books_by_author') }}">Rechercher des livres par auteur</a></li>
+        </ul>
+    </div>
+    
+    <script>
+        function afficherHeure(){
+            $.get('/heure', function(data){
+                console.log(data)
+                $('#heureId').text(data.Heure)
+
+            })
+        }
+            
+        setInterval(() => {
+            afficherHeure()
+        }, 1000);
+
+        afficherHeure();
+    </script>
+</body>
+</html>

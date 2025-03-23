@@ -1,0 +1,53 @@
+.PHONY: setup test clean run start exec
+.DEFAULT_GOAL = help
+SUBDIRS = wsgi
+VENV = .venv
+PYTHON := $(VENV)/bin/python3
+PIP := $(VENV)/bin/pip
+COVERAGE := $(VENV)/bin/coverage
+
+$(VENV):
+	( \
+        python3 -m venv $(VENV); \
+		source ./$</bin/activate ; set -u ;\
+        $(PIP) install --upgrade pip; \
+		$(PIP) install -r requirements.txt; \
+        $(PIP) install coverage flake8 flake8-html pytest pdoc3; \
+	)
+	
+all: setup  test docs lint coverage-check 
+# Installez les dépendances et créez un environnement virtuel
+setup: $(VENV) ## build, start and run docker image
+	@echo "Initialisation de l'environnement virtuel..."
+	bash docker-mysql.sh
+	cd wsgi && $(PYTHON) -m flask run
+
+# Exécutez l'analyse statique du code avec Flake8
+lint: 
+	cd wsgi && ($(PYTHON) -m flake8 --extend-ignore E203,W234,E225,E501,E902 --output-file=flake8_report.txt biblio/templates)
+
+# Exécutez les tests unitaires avec pytest
+test: $(VENV)
+	cd wsgi && $(PYTHON) -m pytest . -p no:logging -p no:warnings --junitxml=pytest.xml
+
+# Générez la documentation avec pdoc
+docs: $(VENV)	
+	cd wsgi && $(PYTHON) -m pdoc --force --output-dir docs biblio 
+
+# Vérifiez la couverture du code avec coverage
+coverage-check: $(VENV)
+	cd wsgi && $(COVERAGE) run -m pytest . -p no:logging -p no:warnings
+	cd wsgi && $(COVERAGE) xml -o coverage_report.xml
+
+help:
+	@echo "---------------HELP-----------------"
+	@echo "To run all the project type make all"
+	@echo "To setup the project type make setup"
+	@echo "To test the project type make test"
+	@echo "To make a static analysis of the project type make lint"
+	@echo "To make the document of the project type make docs"
+	@echo "------------------------------------"
+
+	
+
+ 

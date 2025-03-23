@@ -1,0 +1,19 @@
+# utiliser l´image Python3.12.1 du conteneur
+FROM python:latest
+# Step 2: Installer les Dependences pip and Python 
+
+ENV PYTHONUNBUFFERED 1
+# Step 3: Creation d'un repertoire de travail
+WORKDIR /app
+
+# copier les conteuns du repertoire courrant dans le repertoire /app du conteneur
+ADD ./requirements.txt /app
+RUN apt-get update
+RUN pip install --upgrade pip
+# installer les dependances à Python
+RUN pip install --no-cache-dir -r requirements.txt && \
+opentelemetry-bootstrap -a install
+# RUN opentelemetry-bootstrap -a install
+COPY . .
+# CMD [ "python3", "-m" , "flask", "run", "--host=localhost"]
+CMD ["uwsgi", "--ini", "app.ini" ,"--uid", "www-data"] 

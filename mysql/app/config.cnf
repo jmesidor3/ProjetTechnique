@@ -1,0 +1,10 @@
+[local]
+user = root
+password = password
+host = localhost
+port = 3306
+cache_on = false
+[remote]
+user = myuser
+password = mypassword
+host = mysql

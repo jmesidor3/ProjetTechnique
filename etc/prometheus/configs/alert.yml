@@ -1,0 +1,22 @@
+groups:
+- name: biblio-alerts
+  rules:
+  - alert: MysqlDown
+    expr: mysql_up == 0
+    for: 5s
+    labels:
+      severity: "critical"
+      service: "mysql"
+    annotations:
+      summary: "Service mysql est indisponible"
+      description: "Le service mysql n'est plus accessible depuis 5 seconds."
+  - alert: MysqlUp
+    expr: mysql_up == 1
+    for: 5s
+    labels:
+      severity: "info"
+      service: "mysql"
+    annotations:
+      summary: "Service mysql est disponible"
+      description: "Le service mysql est  accessible depuis 5 seconds."
+

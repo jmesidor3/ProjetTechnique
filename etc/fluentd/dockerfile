@@ -1,0 +1,11 @@
+FROM fluent/fluentd:v1.12.0-debian-1.0
+USER root
+RUN gem install excon -v 0.109.0  && \
+gem install fluent-plugin-prometheus && \ 
+gem install elasticsearch -v 7.17.0 && \ 
+gem install fluent-plugin-mysqlslowquery
+# RUN gem install fluent-plugin-tail
+
+RUN ["gem", "install", "fluent-plugin-elasticsearch", "--no-document", "--version", "5.0.3"]
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+USER fluent

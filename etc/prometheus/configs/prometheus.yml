@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s # Intervalle global de collecte des métriques
+  evaluation_interval: 15s # Intervalle d'évaluation des règles
+  external_labels:
+    monitor: 'biblio-monitor' # Étiquette utilisée pour identifier la source des métriques
+
+rule_files:
+# - /etc/prometheus/alert.yml # Fichier des règles d'alertes
+- /etc/prometheus/alert.yml # Fichier des règles d'alertes
+
+alerting:
+  alertmanagers:
+  - path_prefix: "/alertmanager/" #- scheme: http
+    static_configs:
+    - targets:
+      - alertmanager:9093 # URL du service Alertmanager
+
+
+scrape_configs:
+- job_name: 'mysql'
+  static_configs:
+  - targets: ['mysql-exporter:9104']
+
+  # Scrape config pour l'application Flask exposant Prometheus
+- job_name: 'biblio-nginx'
+  static_configs:
+  - targets: ['localhost:8000']
+  metrics_path: /metrics
+
+
