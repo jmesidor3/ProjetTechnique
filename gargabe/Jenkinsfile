@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     stages {
-        stage('Setup') {
+        stage('Lancement du pipeline') {
             steps {
                 script {
                     // Initial setup, installation of dependencies
@@ -11,61 +11,64 @@ pipeline {
             }
         }   
 
-        stage('Unit Tests') {
+        stage('Stimuler le trafic') {
+            steps {
+                script {
+                    // Initial setup, installation of dependencies
+                    sh 'make trafic'
+                }
+            }
+        }   
+
+        stage('Extraction des logs') {
             steps {
                 script {
                     // Run unit tests and generate coverage report
-                    sh 'make test'
+                    sh 'make extract'
                 }
             }
         }
 
-         stage('Statics Analysis ') {
+         stage('Traitement des logs ') {
             steps {
                 script {
                     // Run unit tests and generate coverage report
-                    sh 'make flake8'
+                    sh 'make traitement'
                 }
             }
         }
 
-        stage('Generate Documentation') {
+        stage('Encodage des variables') {
             steps {
                 script {
                     // Generate documentation with pdoc
-                    sh 'make docs'
+                    sh 'make encodage'
                 }
             }
         }
 
-        stage('Coverage Checks') {
+        stage('Generation de sequences') {
             steps {
                 script {
                     // Check code coverage against a minimum threshold
-                    sh 'make test-coverage'
+                    sh 'make generation'
                 }
             }
         }
-        stage('Clone repository') {
+        stage('Entrainement d un modele') {
             steps {
                 // Checkout du code depuis le référentiel Git
-                git 'https://github.com/josephpierres/MGL7760-H2024-Projet1-Groupe-1.git'
+                  sh 'make training'
             }
         }
         
-        stage('Deploy with Helmfile') {
+        stage('Evaluation d un modele') {
             steps {
-                sh 'kubectl apply -f yamls/'
+                sh 'make evaluation'
             }
         }
     }
 
-    post {
-        always {
-            // Archive generated reports for visualization in Jenkins
-            archiveArtifacts artifacts: 'flake8_report.xml,coverage.xml,pytest.xml,docs/**', fingerprint: true
-            testNG(showFailedBuilds: true, unstableFails: 5, unstableSkips: 25, failedFails:  10, failedSkips:   50)
+    
     }
-        }
-    }
-}
+
